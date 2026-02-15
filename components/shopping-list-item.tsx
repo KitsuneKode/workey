@@ -1,31 +1,43 @@
-import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, Pressable, View } from 'react-native';
 import { theme } from '../theme';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import Entypo from '@expo/vector-icons/Entypo';
 
 type Props = {
   name: string;
   isCompleted?: boolean;
+  onDelete: () => void;
+  onToggleComplete: () => void;
 };
 
-export default function ShoppingListItem({ name, isCompleted = false }: Props) {
-  const handleDelete = () => {
-    Alert.alert(`Are you sure you want to delete ${name}?`, 'It will be gone for good', [
-      { text: 'Yes', onPress: () => console.log('Deleting'), style: 'destructive' },
-
-      { text: 'Cancel', onPress: () => console.log('cancelling'), style: 'cancel' },
-    ]);
-  };
+export default function ShoppingListItem({
+  name,
+  isCompleted = false,
+  onDelete,
+  onToggleComplete,
+}: Props) {
   return (
-    <View style={[styles.itemContainer, isCompleted && styles.completedContainer]}>
-      <Text style={[styles.itemText, isCompleted && styles.completedText]}>{name}</Text>
-      <TouchableOpacity activeOpacity={0.8} onPress={handleDelete}>
+    <Pressable
+      onPress={onToggleComplete}
+      style={[styles.itemContainer, isCompleted && styles.completedContainer]}>
+      <View style={styles.row}>
+        <Entypo
+          name={isCompleted ? 'check' : 'circle'}
+          size={24}
+          color={isCompleted ? theme.colorGrey : theme.colorCerulean}
+        />
+        <Text numberOfLines={1} style={[styles.itemText, isCompleted && styles.completedText]}>
+          {name}
+        </Text>
+      </View>
+      <TouchableOpacity activeOpacity={0.8} onPress={onDelete}>
         <AntDesign
           name="close-circle"
           size={24}
           color={isCompleted ? theme.colorGrey : theme.colorRed}
         />
       </TouchableOpacity>
-    </View>
+    </Pressable>
   );
 }
 const styles = StyleSheet.create({
@@ -46,10 +58,16 @@ const styles = StyleSheet.create({
     fontFamily: 'Rubik',
     fontWeight: '200',
     fontSize: 18,
+    flex: 1,
   },
   completedText: {
     textDecorationLine: 'line-through',
     textDecorationColor: theme.colorGrey,
     color: theme.colorGrey,
+  },
+  row: {
+    flex: 1,
+    flexDirection: 'row',
+    gap: 8,
   },
 });
