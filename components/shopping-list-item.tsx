@@ -18,11 +18,12 @@ export default function ShoppingListItem({ name, isCompleted = false }: Props) {
   return (
     <View style={[styles.itemContainer, isCompleted && styles.completedContainer]}>
       <Text style={[styles.itemText, isCompleted && styles.completedText]}>{name}</Text>
-      <TouchableOpacity
-        style={[styles.button, isCompleted && styles.completedButton]}
-        activeOpacity={0.8}
-        onPress={handleDelete}>
-        <Text style={[styles.buttonText, isCompleted && styles.completedButtonText]}>Delete</Text>
+      <TouchableOpacity activeOpacity={0.8} onPress={handleDelete}>
+        <AntDesign
+          name="close-circle"
+          size={24}
+          color={isCompleted ? theme.colorGrey : theme.colorRed}
+        />
       </TouchableOpacity>
     </View>
   );
@@ -31,7 +32,7 @@ const styles = StyleSheet.create({
   itemContainer: {
     borderBottomColor: theme.colorCerulean,
     borderBottomWidth: 1,
-    paddingHorizontal: 8,
+    paddingHorizontal: 18,
     paddingVertical: 16,
     flexDirection: 'row',
     alignItems: 'center',
@@ -50,22 +51,5 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through',
     textDecorationColor: theme.colorGrey,
     color: theme.colorGrey,
-  },
-  button: {
-    backgroundColor: theme.colorBlack,
-    padding: 8,
-    borderRadius: 6,
-  },
-  completedButton: {
-    backgroundColor: theme.colorGrey,
-  },
-  completedButtonText: {
-    backgroundColor: theme.colorGrey,
-  },
-  buttonText: {
-    color: theme.colorWhite,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
   },
 });
