@@ -6,6 +6,7 @@ import * as Crypto from 'expo-crypto';
 import { storageKey, type ShoppingListItemType } from '../types';
 import { orderShoppingList } from '../utils/helper';
 import { getFromStorage, saveToStorage } from '../utils/storage';
+import * as Haptics from 'expo-haptics';
 
 const newId = () => Crypto.randomUUID();
 
@@ -27,19 +28,20 @@ const newId = () => Crypto.randomUUID();
 export default function App() {
   const [value, setValue] = useState('');
   const [shoppingList, setSetShoppingList] = useState<ShoppingListItemType[]>([]);
-  const handleSubmit = async () => {
+
+  const handleSubmit = () => {
     const newShoppingList = [
       { id: newId(), name: value, lastUpdatedTimestamp: Date.now() },
       ...shoppingList,
     ] satisfies ShoppingListItemType[];
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    await saveToStorage(storageKey, newShoppingList);
+    saveToStorage(storageKey, newShoppingList);
     setSetShoppingList(newShoppingList);
     setValue('');
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     // Alert.alert(`Are you sure you want to delete ${name}?`, 'It will be gone for good', [
     //   { text: 'Yes', onPress: () => console.log('Deleting'), style: 'destructive' },
     //
@@ -50,16 +52,21 @@ export default function App() {
     ) satisfies ShoppingListItemType[];
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    await saveToStorage(storageKey, newShoppingList);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    saveToStorage(storageKey, newShoppingList);
     setSetShoppingList(newShoppingList);
   };
 
-  const handleToggleComplete = async (id: string) => {
+  const handleToggleComplete = (id: string) => {
     const newShoppingList = shoppingList.map((item) => {
       if (item.id !== id) {
         return item;
       }
-
+      if (item.completedAtTimestamp) {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      } else {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
       return {
         ...item,
         lastUpdatedTimestamp: Date.now(),
@@ -68,7 +75,7 @@ export default function App() {
     }) satisfies ShoppingListItemType[];
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    await saveToStorage(storageKey, newShoppingList);
+    saveToStorage(storageKey, newShoppingList);
     setSetShoppingList(newShoppingList);
   };
 
