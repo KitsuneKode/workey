@@ -2,62 +2,39 @@ import ShoppingListItem from '../components/shopping-list-item';
 import { StyleSheet, TextInput, FlatList, View, Text, LayoutAnimation } from 'react-native';
 import { theme } from '../theme';
 import { useEffect, useState } from 'react';
-import * as Crypto from 'expo-crypto';
-import { storageKey, type ShoppingListItemType } from '../types';
-import { orderShoppingList } from '../utils/helper';
+import { shoppingListStorageKey, type ShoppingListItemType } from '../types';
+import { orderShoppingList, newId } from '../utils/helper';
 import { getFromStorage, saveToStorage } from '../utils/storage';
 import * as Haptics from 'expo-haptics';
 
-const newId = () => Crypto.randomUUID();
-
-// const testData = new Array(1000).fill(null).map((item, idx) => ({ id: idx, name: newId() }));
-// const initialList: ShoppingListItemType[] = [
-//   { id: newId(), name: 'Coffee' },
-//   { id: newId(), name: 'Tea' },
-//   { id: newId(), name: 'Green Tea' },
-//   { id: newId(), name: 'Coffee' },
-//   { id: newId(), name: 'Green Tea' },
-//   { id: newId(), name: 'Coffee' },
-//   { id: newId(), name: 'Green Tea' },
-//   { id: newId(), name: 'Coffee' },
-//   { id: newId(), name: 'Green Tea' },
-//   { id: newId(), name: 'Coffee' },
-//   { id: newId(), name: 'Green Tea' },
-// ];
-//
 export default function App() {
   const [value, setValue] = useState('');
   const [shoppingList, setSetShoppingList] = useState<ShoppingListItemType[]>([]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newShoppingList = [
       { id: newId(), name: value, lastUpdatedTimestamp: Date.now() },
       ...shoppingList,
     ] satisfies ShoppingListItemType[];
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    saveToStorage(storageKey, newShoppingList);
+    await saveToStorage(shoppingListStorageKey, newShoppingList);
     setSetShoppingList(newShoppingList);
     setValue('');
   };
 
-  const handleDelete = (id: string) => {
-    // Alert.alert(`Are you sure you want to delete ${name}?`, 'It will be gone for good', [
-    //   { text: 'Yes', onPress: () => console.log('Deleting'), style: 'destructive' },
-    //
-    //   { text: 'Cancel', onPress: () => console.log('cancelling'), style: 'cancel' },
-    // ]);
+  const handleDelete = async (id: string) => {
     const newShoppingList = shoppingList.filter(
       (item) => id !== item.id,
     ) satisfies ShoppingListItemType[];
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    saveToStorage(storageKey, newShoppingList);
+    await saveToStorage(shoppingListStorageKey, newShoppingList);
     setSetShoppingList(newShoppingList);
   };
 
-  const handleToggleComplete = (id: string) => {
+  const handleToggleComplete = async (id: string) => {
     const newShoppingList = shoppingList.map((item) => {
       if (item.id !== id) {
         return item;
@@ -75,13 +52,13 @@ export default function App() {
     }) satisfies ShoppingListItemType[];
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    saveToStorage(storageKey, newShoppingList);
+    await saveToStorage(shoppingListStorageKey, newShoppingList);
     setSetShoppingList(newShoppingList);
   };
 
   useEffect(() => {
     const fetchInitial = async () => {
-      const data = await getFromStorage(storageKey);
+      const data = await getFromStorage(shoppingListStorageKey);
       if (data) {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setSetShoppingList(data);
@@ -98,7 +75,7 @@ export default function App() {
       stickyHeaderIndices={[0]}
       ListEmptyComponent={
         <View style={styles.listEmptyContainer}>
-          <Text>Your shopping list is empty</Text>
+          <Text style={styles.text}>Your shopping list is empty</Text>
         </View>
       }
       ListHeaderComponent={
@@ -147,5 +124,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 18,
+  },
+  text: {
+    fontSize: 18,
   },
 });

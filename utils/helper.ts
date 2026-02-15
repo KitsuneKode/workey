@@ -1,4 +1,5 @@
 import type { ShoppingListItemType } from '../types';
+import * as Crypto from 'expo-crypto';
 
 export function orderShoppingList(shoppingList: ShoppingListItemType[]) {
   return shoppingList.sort((item1, item2) => {
@@ -21,3 +22,10 @@ export function orderShoppingList(shoppingList: ShoppingListItemType[]) {
     return 0;
   });
 }
+
+export const newId = () => Crypto.randomUUID();
+
+//10 sec
+export const frequency = 10 * 1000;
+
+export const fullDateFormat = `LLL d yyyy, h:mm aaa`;
